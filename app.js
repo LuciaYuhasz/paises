@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Rutas
-app.use('/api', gameRoutes);
+//app.use('/api', gameRoutes);
 // Ruta principal
 app.get('/', (req, res) => {
     res.render('index');
@@ -24,3 +24,7 @@ app.get('/', (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => console.log(`Servidor ejecutándose en http://localhost:${PORT}`));
+
+
+///      netstat -ano | findstr :3000
+////     taskkill /PID 9536 /F
