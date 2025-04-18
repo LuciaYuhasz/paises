@@ -127,3 +127,24 @@ function generateNumericOptions(correctAnswer) {
     return Array.from(options).sort((a, b) => a - b);
 }
 
+function endGame() {
+    const totalTime = (Date.now() - startTime) / 1000;
+
+    fetch('/api/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, score, correct, incorrect, totalTime })
+    })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch(err => {
+            console.error('Error al guardar el resultado:', err);
+            alert("Ocurrió un error al guardar el puntaje.");
+        });
+}
+/*git add . — agregaste los cambios
+✅ git commit -m "comienzo del front" — creaste el commit con un mensaje claro
+✅ git push — subiste los cambios a GitHub sin problemas*/
