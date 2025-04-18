@@ -1,14 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Juego de Preguntas</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
 </head>
 
 <body>
 
+    <!-- Formulario de registro -->
+    <div id="registerForm" style="display: block;">
+        <label for="username">Ingresa tu nombre:</label>
+        <input type="text" id="username" placeholder="Tu nombre" required />
+        <button id="startGameButton">Empezar Juego</button>
+    </div>
+
+    <!-- Área del juego -->
+    <div id="gameArea" style="display: none;">
+        <div id="questionText"></div>
+        <ul id="optionsList"></ul>
+    </div>
+
+    <!-- Contenedor de mensajes -->
+    <div id="resultMessage" style="display: none;"></div>
+
+    <!-- Área de clasificación -->
+    <div id="rankingArea" style="display: none;">
+        <h3>Tabla de clasificación</h3>
+        <ol id="rankingList">
+            <!-- Aquí se mostrarán los 20 mejores puntajes -->
+        </ol>
+        <button id="backToGameButton">Volver al juego</button>
+    </div>
+
 </body>
+
 
 </html>
