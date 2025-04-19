@@ -6,48 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juego de Preguntas</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap y estilos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Tu CSS personalizado -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 
-    <!-- JS del juego -->
+    <!-- JS -->
     <script src="game.js" defer></script>
 </head>
 
-<body class="bg-dark text-white">
+<body class="bg-gradient">
 
-    <div class="container py-5 text-center">
+    <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
 
-        <!-- Formulario de registro -->
-        <div id="registerForm" class="card p-4 mx-auto mb-4" style="max-width: 400px;">
-            <h2 class="mb-3">Bienvenido/a</h2>
-            <label for="username" class="form-label">Ingresa tu nombre:</label>
-            <input type="text" id="username" class="form-control mb-3" placeholder="Tu nombre" required>
-            <button id="startGameButton" class="btn btn-primary w-100">Empezar Juego</button>
+        <!-- Pantalla de registro -->
+        <div id="registerForm" class="card-glass p-4 text-center w-100" style="max-width: 500px;">
+
+            <h2 class="mb-3 titulo-claro">
+                <i class="bi bi-emoji-sunglasses"></i> ¡Bienvenido, explorador!
+            </h2>
+
+
+
+            <p> ¿Estás listo para comenzar este reto?</p>
+            <input type="text" id="username" class="form-control mb-3" placeholder="Escribe tu nombre aca" required>
+            <button id="startGameButton" class="btn btn-success w-100">
+                Challenge accepted! <i class="bi bi-rocket-takeoff-fill ms-2"></i>
+            </button>
+
         </div>
 
         <!-- Área del juego -->
-        <div id="gameArea" class="card p-4 mx-auto mb-4" style="max-width: 600px; display: none;">
+        <div id="gameArea" class="card-glass p-4 mt-4 w-100 text-center" style="max-width: 600px; display: none;">
+            <div class="progress mb-3">
+                <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%">
+                </div>
+            </div>
             <div id="questionText" class="fs-4 mb-3"></div>
             <ul id="optionsList" class="list-group"></ul>
         </div>
 
         <!-- Mensaje de resultado -->
-        <div id="resultMessage" class="alert alert-info mt-3" style="display: none;"></div>
+        <div id="resultMessage" class="alert alert-info mt-3 w-100 text-center"
+            style="max-width: 600px; display: none;"></div>
 
-        <!-- Ranking -->
-        <div id="rankingArea" class="card p-4 mx-auto mt-4" style="max-width: 500px; display: none;">
-            <h3 class="mb-3">Tabla de clasificación</h3>
-            <ol id="rankingList" class="text-start">
-                <!-- Aquí se mostrarán los puntajes -->
-            </ol>
-            <button id="backToGameButton" class="btn btn-secondary mt-3">Volver al juego</button>
+        <!-- Área de ranking -->
+        <div id="rankingArea" class="card-glass p-4 mt-4 text-center w-100" style="max-width: 500px; display: none;">
+            <h3 class="mb-3"><i class="bi bi-trophy-fill text-warning"></i> Ranking</h3>
+            <ol id="rankingList" class="text-start"></ol>
+            <button id="backToGameButton" class="btn btn-secondary mt-3">Volver a jugar</button>
         </div>
 
     </div>
 
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

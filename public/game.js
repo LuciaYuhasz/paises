@@ -37,7 +37,10 @@ async function loadCountries() {
         console.error(error);
     }
 }
-
+function updateProgressBar() {
+    const progress = (currentQuestionIndex / 5) * 100;
+    document.getElementById("progressBar").style.width = `${progress}%`;
+}
 function generateQuestion() {
     if (currentQuestionIndex >= 5) {
         return endGame();
@@ -98,6 +101,7 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
                 alert(`❌ Incorrecto. La respuesta era: ${correctAnswer}`);
             }
             currentQuestionIndex++;
+            updateProgressBar();
             generateQuestion();
         };
         optionsList.appendChild(li);
@@ -145,6 +149,3 @@ function endGame() {
             alert("Ocurrió un error al guardar el puntaje.");
         });
 }
-/*git add . — agregaste los cambios
-✅ git commit -m "comienzo del front" — creaste el commit con un mensaje claro
-✅ git push — subiste los cambios a GitHub sin problemas*/
