@@ -1,4 +1,22 @@
 // public/game.js
+// sonido de tipeo
+const keypressSound = new Audio('sounds/tipeo.mp3');
+// Archivo de sonido para el botón challe acepto
+const buttonClickSound = new Audio('sounds/chalentacept.mp3');
+//sonido de correcto e incorrecto 
+// Sonidos para respuestas
+const correctSound = new Audio('sounds/correcto.mp3'); // Sonido para respuestas correctas
+const incorrectSound = new Audio('sounds/incorrecto.mp3'); // Sonido para respuestas incorrectas
+
+
+//sonido de fondo
+
+const backgroundMusic = new Audio('sounds/fondoJuego.mp3');
+backgroundMusic.loop = true; // Reproduce en bucle
+backgroundMusic.volume = 0.5; // Ajusta el volumen inicial
+let isMusicMuted = false; // Variable global para controlar si la música está silenciada
+const toggleMusicButton = document.getElementById('toggleMusicButton');
+const musicControl = document.getElementById('musicControl'); // Contenedor del botón para silenciar música
 
 let countries = [];
 let usedCountries = [];
@@ -16,9 +34,32 @@ const gameArea = document.getElementById('gameArea');
 const startGameButton = document.getElementById('startGameButton');
 const usernameInput = document.getElementById('username');
 
+
+// Agregar el evento al campo de texto
+usernameInput.addEventListener('input', () => {
+    keypressSound.pause(); // Reinicia el sonido por si es muy corto
+    keypressSound.volume = 0.2;
+    keypressSound.currentTime = 0;
+    keypressSound.play();
+});
+
 startGameButton.addEventListener('click', async () => {
+    //reproducir sonido boton chalentacept
+    buttonClickSound.pause(); // Reinicia el sonido si ya está reproduciéndose
+    buttonClickSound.currentTime = 0;
+    buttonClickSound.play();
     username = usernameInput.value.trim();
     if (!username) return alert('Ingresa tu nombre.');
+
+
+    // Reproduce la música al iniciar el juego, si no está silenciada
+    if (!isMusicMuted) {
+        backgroundMusic.play();
+        // Muestra el botón para silenciar música
+        musicControl.style.display = 'block'; // Hacer visible el botón
+    }
+
+    // Cambia la visibilidad de las secciones
 
     registerForm.style.display = 'none';
     gameArea.style.display = 'block';
@@ -26,6 +67,18 @@ startGameButton.addEventListener('click', async () => {
 
     await loadCountries();
     generateQuestion();
+});
+
+toggleMusicButton.addEventListener('click', () => {
+    if (isMusicMuted) {
+        backgroundMusic.play();
+        toggleMusicButton.innerHTML = '<i class="bi bi-volume-up"></i> Silenciar Música';
+    } else {
+        backgroundMusic.pause();
+        toggleMusicButton.innerHTML = '<i class="bi bi-volume-mute"></i> Reanudar Música';
+    }
+    isMusicMuted = !isMusicMuted;
+    localStorage.setItem('isMusicMuted', isMusicMuted); // Guarda la preferencia
 });
 
 async function loadCountries() {
@@ -93,10 +146,17 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         li.onclick = () => {
             const isCorrect = option.toString().toLowerCase() === correctAnswer.toString().toLowerCase();
             if (isCorrect) {
+                correctSound.pause(); // Reinicia el sonido si se está reproduciendo
+                correctSound.currentTime = 0;
+                correctSound.play(); // Reproduce el sonido de respuesta correcta
+
                 score += type === 'flag' ? 5 : 3;
                 correct++;
                 alert("✅ ¡Correcto!");
             } else {
+                incorrectSound.pause(); // Reinicia el sonido si se está reproduciendo
+                incorrectSound.currentTime = 0;
+                incorrectSound.play(); // Reproduce el sonido de respuesta incorrecta
                 incorrect++;
                 alert(`❌ Incorrecto. La respuesta era: ${correctAnswer}`);
             }

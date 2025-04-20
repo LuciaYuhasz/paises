@@ -1,5 +1,5 @@
 //const { getNewQuestion, evaluateAnswer, resetGame, getGameState } = require('./game');
-const fs = require('fs');
+/*const fs = require('fs');
 const path = require('path');
 const rankingFilePath = path.join(__dirname, 'data', 'ranking.json');
 
@@ -23,4 +23,4 @@ const submitAnswer = (req, res) => {
         console.error("Error al procesar la respuesta:", error);
         res.status(500).json({ error: 'Error al procesar la respuesta.' });
     }
-};
+};*/
