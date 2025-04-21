@@ -137,33 +137,65 @@ function generateQuestion() {
 }
 
 function displayQuestion({ question, options, correctAnswer, type, flag }) {
+    //con modal
+    const modal = document.getElementById('resultModal');
+    const modalMessage = document.getElementById('modalMessage');
+
     questionText.innerHTML = flag ? `<img src="${flag}" alt="Bandera" style="width:100px;"><br>${question}` : question;
     optionsList.innerHTML = '';
 
-    options.forEach(option => {
+    options.forEach((option, index) => {  // aca agregue en index para que pueda implementar el estilo css y la ubicacionde cada elemnto 
         const li = document.createElement('li');
         li.textContent = option;
+        //estilo css
+        li.classList.add('list-group-item'); // Clase básica con animaciones
+        li.style.animationDelay = `${index * 0.2}s`; // Retraso dinámico para cada opción
         li.onclick = () => {
+            //color para correcta o incorrecto
+            // Deshabilitar todas las opciones para evitar múltiples clics
+            const allOptions = document.querySelectorAll('#optionsList li');
+            allOptions.forEach(opt => opt.onclick = null); // Elimina onclick
+
             const isCorrect = option.toString().toLowerCase() === correctAnswer.toString().toLowerCase();
             if (isCorrect) {
+                //aca estilo 
+                li.classList.add('correct-answer');
+                //
                 correctSound.pause(); // Reinicia el sonido si se está reproduciendo
                 correctSound.currentTime = 0;
                 correctSound.play(); // Reproduce el sonido de respuesta correcta
 
                 score += type === 'flag' ? 5 : 3;
                 correct++;
-                alert("✅ ¡Correcto!");
+                modalMessage.textContent = "✅ ¡Correcto!";
             } else {
+
+                //estilo
+                li.classList.add('incorrect-answer');
+                //
                 incorrectSound.pause(); // Reinicia el sonido si se está reproduciendo
                 incorrectSound.currentTime = 0;
                 incorrectSound.play(); // Reproduce el sonido de respuesta incorrecta
                 incorrect++;
-                alert(`❌ Incorrecto. La respuesta era: ${correctAnswer}`);
+                modalMessage.textContent = `❌ Incorrecto. La respuesta era: ${correctAnswer}`;
             }
-            currentQuestionIndex++;
-            updateProgressBar();
-            generateQuestion();
+
+            // Mostrar el modal
+            modal.style.display = "flex";
+
+            //Cerrar el modal y pasar a la siguiente pregunta
+            document.getElementById('closeModalButton').onclick = () => {
+                modal.style.display = "none";
+                currentQuestionIndex++;
+                updateProgressBar();
+                generateQuestion();
+            };
         };
+        setTimeout(() => {
+            li.style.opacity = 1; // Hace visible la opción
+            li.style.transform = 'translateY(0)'; // Posición final
+        }, index * 200); // Retraso por índice
+
         optionsList.appendChild(li);
     });
 }
