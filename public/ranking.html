@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ranking de Jugadores</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div id="rankingContainer">
+        <h2>🏆 Ranking de los mejores jugadores</h2>
+        <ol id="rankingList"></ol>
+        <button id="backToGameButton">Volver al juego</button>
+    </div>
+
+
+
+    <script>
+        fetch('/api/ranking')
+            .then(res => res.json())
+            .then(data => {
+                const rankingList = document.getElementById('rankingList');
+                rankingList.innerHTML = "";
+
+                data.forEach((player, index) => {
+                    const listItem = document.createElement('li');
+
+                    // Añadir emoji según la posición
+                    let medal = "";
+                    if (index === 0) medal = "🥇";
+                    else if (index === 1) medal = "🥈";
+                    else if (index === 2) medal = "🥉";
+
+                    // Armar contenido del <li>
+                    listItem.innerHTML = `<strong>${index + 1}.</strong> ${medal} ${player.player} - ${player.score} pts`;
+
+                    // Agregar clase según posición
+                    if (index === 0) listItem.classList.add('top-1');
+                    else if (index === 1) listItem.classList.add('top-2');
+                    else if (index === 2) listItem.classList.add('top-3');
+
+                    rankingList.appendChild(listItem);
+                });
+            })
+            .catch(err => {
+                console.error("Error al obtener el ranking:", err);
+            });
+
+        document.getElementById('backToGameButton').onclick = () => {
+            window.location.href = "index.html"; // Redirige de vuelta al juego
+        };
+    </script>
+</body>
+
+</html>
