@@ -1,16 +1,15 @@
-doctype html
-html(lang="es")
-  head
-    meta(charset="UTF-8")
-    title Ranking de Jugadores
-    link(rel="stylesheet", href="styles.css")
+extends layout
 
-  body
-    #rankingContainer
+block content
+     #rankingContainer
       h2 🏆 Ranking de los mejores jugadores
       ol#rankingList
-      button#backToGameButton Volver al juego
+      button#backToGameButton.btn.btn-primary.btn-lg.px-4.py-2.mt-4.shadow
+        i.bi.bi-arrow-counterclockwise.me-2
+        | Volver a jugar
 
+
+block scripts 
     script.
       fetch('/api/ranking')
         .then(res => res.json())
@@ -45,5 +44,6 @@ html(lang="es")
         });
 
       document.getElementById('backToGameButton').onclick = () => {
-        window.location.href = "index.pug";
+        window.location.href = "/";
+        
       };

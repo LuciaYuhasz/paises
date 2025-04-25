@@ -1,19 +1,7 @@
-doctype html
-html(lang="es")
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport" content="width=device-width, initial-scale=1.0")
-    title Mundo Quiz: ¿Cuánto Sabes?
-    // Favicon
-    link(rel="icon" type="image/x-icon" href="images/favicon.ico")
-    // Bootstrap y estilos
-    link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet")
-    link(href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet")
-    link(rel="stylesheet" href="styles.css")
-    // JS
-    script(src="game.js" defer)
-
-  body
+extends layout
+block head
+  script(src="/game.js" defer)
+block content
     .text-center.mt-3#musicControl(style="display: none;")
       button#toggleMusicButton.btn.btn-secondary
         i.bi.bi-volume-up
@@ -24,17 +12,21 @@ html(lang="es")
       // Pantalla de registro
       #registerForm.card-glass.p-4.text-center.w-100(style="max-width: 500px;")
         h2.mb-3.titulo-claro
-          i.bi.bi-emoji-sunglasses.emoji
-          |  ¡
-          span.highlight Bienvenido
-          | , 
-          span.highlight-blue explorador
-          | !
+         |¡
+         span.highlight Bienvenido
+         | , 
+         span.highlight-blue explorador
+         | !
+
         p.intro-text ¿Estás listo para comenzar este reto?
         input#username.form-control.mb-3(type="text" placeholder="Escribe tu nombre acá" required)
         button#startGameButton.btn.btn-success.w-100
           | Challenge accepted!
           i.bi.bi-rocket-takeoff-fill.ms-2
+
+        button#viewRankingButton.btn.btn-warning.w-100.mt-3
+          | 🏅 Ver el ranking
+          i.bi.bi-bar-chart-fill.ms-2
 
       // Área del juego
       #gameArea.card-glass.p-4.mt-4.w-100.text-center(style="max-width: 600px; display: none;")
@@ -42,6 +34,13 @@ html(lang="es")
           #progressBar.progress-bar.progress-bar-striped.progress-bar-animated(style="width: 0%")
         #questionText.fs-4.mb-3
         ul#optionsList.list-group
+
+
+          // Contenedor de pista con bandera
+      #hintContainer.mt-3(style="display: none;")
+        button#showFlagHintButton.btn.btn-info.mb-2 Ayudita con la bandera del Pais💡
+      #flagHint
+
 
       // Modal para el resultado de cada pregunta
       #questionResultModal.modal
@@ -52,12 +51,10 @@ html(lang="es")
       // Modal para el resultado final del juego
       #gameResultModal.modal
         .modal-content
-          h3.fw-bold Finalizaste 🎉 tu resultado final es: 
+          h3.fw-bold 🌟 FINALIZASTE! 🌟 
           p#modalMessage
           p#modalDetails
           p#modalRanking
-          button#viewRankingButton.btn.btn-warning.mt-3 📊 Ver el ranking
-          button#closeResultModalButton.btn.btn-primary.mt-3 🔄 Reiniciar juego
+          button#viewRankingButtonFinal.btn.btn-warning.mt-3 📊 Ir al ranking
+          button#closeResultModalButton.btn.btn-primary.mt-3 🔁 Volver a jugar!
 
-    // Bootstrap JS
-    script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js")

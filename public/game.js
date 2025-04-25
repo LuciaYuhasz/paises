@@ -155,14 +155,19 @@ function generateQuestion() {
     switch (type) {
         case 'capital':
             if (!country.capital) return generateQuestion(); // Evitar preguntas sin capital definida
-            question = `¿Cuál es el país de la capital ${country.capital[0]}?`;
-            correctAnswer = country.name.common;
+            question = `¿${country.capital[0]} , es la capital de qué país??`;
+            //correctAnswer = country.name.common;
+            correctAnswer = country.translations?.spa?.common || country.name.common;
+
             options = generateOptions(correctAnswer); // Generar opciones de respuesta
             break;
         case 'flag':
             if (!country.flags || !country.flags.png) return generateQuestion(); // Evitar países sin bandera
             question = `¿Qué país está representado por esta bandera?`;
-            correctAnswer = country.name.common;
+            //correctAnswer = country.name.common;
+            correctAnswer = country.translations?.spa?.common || country.name.common;
+
+
             options = generateOptions(correctAnswer); // Generar opciones de respuesta
             break;
         case 'borders':
@@ -182,7 +187,31 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
     const modalMessageQuestion = document.getElementById('modalMessageQuestion');
 
     // Mostrar pregunta con la bandera si está disponible
-    questionText.innerHTML = flag ? `<img src="${flag}" alt="Bandera" style="width:100px;"><br>${question}` : question;
+    questionText.innerHTML = (type === 'flag' && flag)
+        ? `<img src="${flag}" alt="Bandera" class="flag-question-img"><br>${question}`
+        : question;
+
+
+    const hintContainer = document.getElementById('hintContainer');
+    const showFlagHintButton = document.getElementById('showFlagHintButton');
+    const flagHint = document.getElementById('flagHint');
+
+    // Ocultar pista por defecto
+    hintContainer.style.display = 'none';
+    flagHint.innerHTML = '';
+    showFlagHintButton.style.display = 'inline-block'; // Asegura que vuelva a aparecer el botón
+
+
+    // Mostrar botón de pista si no es pregunta de bandera
+    if (type !== 'flag' && flag) {
+        hintContainer.style.display = 'block';
+
+        showFlagHintButton.onclick = () => {
+            flagHint.innerHTML = `<img src="${flag}" alt="Bandera del país" class="flag-question-img">`;
+            showFlagHintButton.style.display = 'none'; // Ocultar botón tras usar pista
+        };
+    }
+
     optionsList.innerHTML = ''; // Limpiar lista de opciones
 
     // Mostrar cada opción como elemento de lista
@@ -242,7 +271,9 @@ function generateOptions(correctAnswer) {
 
     while (options.size < 4) {
         const random = countries[Math.floor(Math.random() * countries.length)];
-        options.add(random.name.common);
+        //options.add(random.name.common);
+        const nameInSpanish = random.translations?.spa?.common || random.name.common;
+        options.add(nameInSpanish);
     }
 
     return Array.from(options).sort(() => Math.random() - 0.5);
@@ -279,7 +310,7 @@ function endGame() {
             const modalRanking = document.getElementById('modalRanking');
 
             // Rellena el mensaje del modal con los resultados
-            modalMessage.innerHTML = `<strong>🎉 Juego terminado</strong>`;
+            modalMessage.innerHTML = `<strong> Tu resultado :</strong>`;
             modalDetails.innerHTML = `
                 <p>Puntaje: <strong>${score}</strong></p>
                 <p>Correctas: <strong>${correct}</strong></p>
@@ -288,9 +319,15 @@ function endGame() {
                 <p>Tiempo promedio por pregunta: <strong>${avgTimePerQuestion} segundos</strong></p>
                 
             `;
+            // Mensaje de ranking 
+            if (data.position !== null) {
+                modalRanking.textContent = `🔥🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥🔥`;
+            } else {
+                modalRanking.textContent = ` Todavía no estás en la cima, pero cada intento te acerca más 🔝`;
+            }
 
-            // Mensaje de ranking con la posición del jugador
-            modalRanking.innerHTML = `🎯 ¡Has alcanzado la posición <strong>${data.position}</strong> en el ranking!`;
+
+            //modalRanking.innerHTML = `🎯 ¡Has alcanzado la posición <strong>${data.position}</strong> en el ranking!`;
 
             // Mostrar el modal
             gameModal.style.display = "flex";
@@ -305,6 +342,9 @@ function endGame() {
 }
 /////////////////////////////////
 document.getElementById('viewRankingButton').onclick = () => {
-    window.location.href = "ranking.html"; // Redirige a la nueva página de ranking
+    window.location.href = "/ranking"; // Redirige a la nueva página de ranking
 };
 
+document.getElementById('viewRankingButtonFinal').onclick = () => {
+    window.location.href = "/ranking";
+};
