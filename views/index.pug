@@ -10,11 +10,14 @@ block content
     .container.d-flex.flex-column.justify-content-center.align-items-center.min-vh-100
 
       // Pantalla de registro
+      //errores
+      #errorContainer.alert.alert-danger.text-center.mt-3(role="alert" style="display: none;")
+
       #registerForm.card-glass.p-4.text-center.w-100(style="max-width: 500px;")
         h2.mb-3.titulo-claro
          |¡
          span.highlight Bienvenido
-         | , 
+         |  
          span.highlight-blue explorador
          | !
 

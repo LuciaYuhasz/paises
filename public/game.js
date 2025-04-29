@@ -1,35 +1,35 @@
 //public/index.html
 
 // Definición de sonidos para efectos de juego
-const keypressSound = new Audio('sounds/tipeo.mp3'); // Sonido al escribir
-const buttonClickSound = new Audio('sounds/chalentacept.mp3'); // Sonido al hacer clic en botón
-const correctSound = new Audio('sounds/correcto.mp3'); // Sonido para respuestas correctas
-const incorrectSound = new Audio('sounds/incorrecto.mp3'); // Sonido para respuestas incorrectas
-const backgroundMusic = new Audio('sounds/fondoJuego.mp3'); // Música de fondo del juego
+const keypressSound = new Audio('sounds/tipeo.mp3');
+const buttonClickSound = new Audio('sounds/chalentacept.mp3');
+const correctSound = new Audio('sounds/correcto.mp3');
+const incorrectSound = new Audio('sounds/incorrecto.mp3');
+const backgroundMusic = new Audio('sounds/fondoJuego.mp3'); // Música de fondo 
 
 backgroundMusic.loop = true; // Reproducir música en bucle
-backgroundMusic.volume = 0.5; // Volumen inicial de la música
+backgroundMusic.volume = 0.5;
 let isMusicMuted = false; // Estado de silenciamiento de la música
-const toggleMusicButton = document.getElementById('toggleMusicButton'); // Botón para silenciar o reanudar música
+const toggleMusicButton = document.getElementById('toggleMusicButton');
 const musicControl = document.getElementById('musicControl'); // Contenedor del control de música
 
 // Variables de juego y estado
-let countries = []; // Array para almacenar países
-let usedCountries = []; // Array para países usados en el juego
+let countries = [];
+let usedCountries = [];
 let currentQuestionIndex = 0; // Índice de la pregunta actual
 let correct = 0; // Contador de respuestas correctas
 let incorrect = 0; // Contador de respuestas incorrectas
 let score = 0; // Puntaje total del juego
-let startTime; // Tiempo de inicio del juego
-let username = ''; // Nombre de usuario
+let startTime;
+let username = '';
 
 // Elementos del DOM
-const questionText = document.getElementById('questionText'); // Texto de la pregunta
-const optionsList = document.getElementById('optionsList'); // Lista de opciones
-const registerForm = document.getElementById('registerForm'); // Formulario de registro
-const gameArea = document.getElementById('gameArea'); // Área de juego
-const startGameButton = document.getElementById('startGameButton'); // Botón para iniciar juego
-const usernameInput = document.getElementById('username'); // Entrada de nombre de usuario
+const questionText = document.getElementById('questionText');
+const optionsList = document.getElementById('optionsList');
+const registerForm = document.getElementById('registerForm');
+const gameArea = document.getElementById('gameArea');
+const startGameButton = document.getElementById('startGameButton');
+const usernameInput = document.getElementById('username');
 
 // Evento al escribir en el campo de nombre de usuario
 usernameInput.addEventListener('input', () => {
@@ -39,16 +39,16 @@ usernameInput.addEventListener('input', () => {
     keypressSound.currentTime = 0;
     keypressSound.play();
 });
-///////////////
+
+//FUNCION DE COMIENZO/REINICIO PARTIDO 
 function startGame() {
-    console.log("startGame() ejecutado"); // Verifica que la función se está llamando
-    console.log("Ocultando formulario y mostrando área de juego...");
+    console.log("startGame() ejecutado");
 
     buttonClickSound.pause();
     buttonClickSound.currentTime = 0;
     buttonClickSound.play();
 
-    username = usernameInput.value.trim();
+    username = usernameInput.value.trim();// trim para eliminar espacios en blanco
     if (!username) return alert('Ingresa tu nombre.');
 
     // Reproduce la música al iniciar el juego, si no está silenciada
@@ -92,49 +92,65 @@ function startGame() {
 }
 
 
-// Asignamos la función 'startGame' al botón de inicio
+// Asignacion la función 'startGame' al botón de inicio
 startGameButton.addEventListener('click', startGame);
 
-// También asignamos la función 'startGame' al botón "Jugar de nuevo"
+// También al botón "Jugar de nuevo"
 document.getElementById('closeResultModalButton').addEventListener('click', startGame);
 
 
 
 // Evento para silenciar o reanudar la música de fondo
 toggleMusicButton.addEventListener('click', () => {
+    isMusicMuted = !isMusicMuted;
     if (isMusicMuted) {
-        backgroundMusic.play();
-        toggleMusicButton.innerHTML = '<i class="bi bi-volume-up"></i> Silenciar Música';
-    } else {
         backgroundMusic.pause();
         toggleMusicButton.innerHTML = '<i class="bi bi-volume-mute"></i> Reanudar Música';
+        toggleMusicButton.classList.add('muted'); // Cambia el estilo
+
+        toggleMusicButton.style.backgroundColor = "#f44336";
+    } else {
+        backgroundMusic.play();
+        toggleMusicButton.innerHTML = '<i class="bi bi-volume-up"></i> Silenciar Música';
+        toggleMusicButton.classList.remove('muted'); // Vuelve al estilo original
+
+        toggleMusicButton.style.backgroundColor = "#4CAF50";
+        console.log("Clase muted eliminada:", toggleMusicButton.classList.contains('muted'))
     }
-    isMusicMuted = !isMusicMuted;
-    localStorage.setItem('isMusicMuted', isMusicMuted); // Guardar preferencia de música en localStorage
+    localStorage.setItem('isMusicMuted', isMusicMuted);
 });
 
-// Función asincrónica para cargar datos de países desde una API
+// FUNCION ASINCRONA PARA CARGAR PAISES EN LA API 
 async function loadCountries() {
+    const errorContainer = document.getElementById('errorContainer');
+    errorContainer.style.display = 'none'; // Oculta errores anteriores
+    errorContainer.textContent = '';
     try {
         const response = await fetch('https://restcountries.com/v3.1/all');
-        countries = await response.json(); // Almacenar datos de países en la variable countries
+        // Validar estado de respuesta HTTP
+        if (!response.ok) {
+            throw new Error(`Error al obtener países: ${response.status} ${response.statusText}`);
+        }
+        countries = await response.json();
     } catch (error) {
-        alert("No se pudieron cargar los países."); // Alerta en caso de error al cargar países
+
         console.error(error);
+        errorContainer.textContent = `⚠️ ${error.message}`;
+        errorContainer.style.display = 'block'; // Muestra el error en pantalla
     }
 }
 
 // Función para actualizar la barra de progreso del juego
 function updateProgressBar() {
-    const progress = (currentQuestionIndex / 5) * 100;
-    document.getElementById("progressBar").style.width = `${progress}%`;
+    const progress = (currentQuestionIndex / 10) * 100;
+    document.getElementById("progressBar").style.width = `${progress}%`;// se  ajusta el ancho segun el valor de progrees, que representa el porsentaje 
 }
 
 
 // Función para generar y mostrar una pregunta aleatoria
 function generateQuestion() {
-    if (currentQuestionIndex >= 5) {
-        return endGame(); // Finalizar juego si se han mostrado todas las preguntas
+    if (currentQuestionIndex >= 10) {
+        return endGame(); // Finaliza juego si se mostraron todas las preguntas
     }
 
     let country;
@@ -155,7 +171,7 @@ function generateQuestion() {
     switch (type) {
         case 'capital':
             if (!country.capital) return generateQuestion(); // Evitar preguntas sin capital definida
-            question = `¿${country.capital[0]} , es la capital de qué país??`;
+            question = `¿${country.capital[0]} , es la capital de qué país?`;
             //correctAnswer = country.name.common;
             correctAnswer = country.translations?.spa?.common || country.name.common;
 
@@ -303,6 +319,7 @@ function endGame() {
     })
         .then(res => res.json())
         .then(data => {
+            localStorage.removeItem('ranking');
             // Obtener los elementos del modal
             const gameModal = document.getElementById('gameResultModal');
             const modalMessage = document.getElementById('modalMessage');
@@ -326,9 +343,6 @@ function endGame() {
                 modalRanking.textContent = ` Todavía no estás en la cima, pero cada intento te acerca más 🔝`;
             }
 
-
-            //modalRanking.innerHTML = `🎯 ¡Has alcanzado la posición <strong>${data.position}</strong> en el ranking!`;
-
             // Mostrar el modal
             gameModal.style.display = "flex";
 
@@ -340,7 +354,7 @@ function endGame() {
             alert("Ocurrió un error al guardar el puntaje.");
         });
 }
-/////////////////////////////////
+
 document.getElementById('viewRankingButton').onclick = () => {
     window.location.href = "/ranking"; // Redirige a la nueva página de ranking
 };

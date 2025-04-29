@@ -1,107 +1,18 @@
 [
   {
-    "player": "trtwetw",
+    "player": "bbb",
     "score": 13,
     "correct": 3,
-    "incorrect": 2,
-    "totalTime": 14.686
+    "incorrect": 7,
+    "totalTime": 16.809,
+    "avgTimePerQuestion": "3.362"
   },
   {
-    "player": "trtwetw",
-    "score": 11,
-    "correct": 3,
-    "incorrect": 2,
-    "totalTime": 21.23
-  },
-  {
-    "player": "trtwetw",
+    "player": "aaa",
     "score": 10,
     "correct": 2,
-    "incorrect": 3,
-    "totalTime": 12.807
-  },
-  {
-    "player": "trtwetw",
-    "score": 10,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 9.285
-  },
-  {
-    "player": "pamme",
-    "score": 8,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 5.366
-  },
-  {
-    "player": "gregreg",
-    "score": 8,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 6.821
-  },
-  {
-    "player": "trtwetw",
-    "score": 8,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 8.463
-  },
-  {
-    "player": "rrrrr",
-    "score": 8,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 4.543
-  },
-  {
-    "player": "ffff",
-    "score": 8,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 4.983
-  },
-  {
-    "player": "trtwetw",
-    "score": 6,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 8.775
-  },
-  {
-    "player": "pamme",
-    "score": 6,
-    "correct": 2,
-    "incorrect": 3,
-    "totalTime": 6.128
-  },
-  {
-    "player": "pamme",
-    "score": 5,
-    "correct": 1,
-    "incorrect": 4,
-    "totalTime": 4.998
-  },
-  {
-    "player": "usuario1",
-    "score": 3,
-    "correct": 1,
-    "incorrect": 4,
-    "totalTime": 5.569
-  },
-  {
-    "player": "trtwetw",
-    "score": 3,
-    "correct": 1,
-    "incorrect": 4,
-    "totalTime": 32.406
-  },
-  {
-    "player": "gregreg",
-    "score": 0,
-    "correct": 0,
-    "incorrect": 5,
-    "totalTime": 10.311
+    "incorrect": 8,
+    "totalTime": 17.647,
+    "avgTimePerQuestion": "3.529"
   }
 ]
