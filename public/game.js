@@ -1,4 +1,3 @@
-//public/index.html
 
 // Definición de sonidos para efectos de juego
 const keypressSound = new Audio('sounds/tipeo.mp3');
@@ -14,6 +13,7 @@ const toggleMusicButton = document.getElementById('toggleMusicButton');
 const musicControl = document.getElementById('musicControl'); // Contenedor del control de música
 
 // Variables de juego y estado
+let gameTimerInterval; // Intervalo del reloj
 let countries = [];
 let usedCountries = [];
 let currentQuestionIndex = 0; // Índice de la pregunta actual
@@ -64,6 +64,16 @@ function startGame() {
     score = 0;
     usedCountries = [];
     startTime = Date.now();
+
+    const gameTimerElement = document.getElementById('gameTimer');
+    clearInterval(gameTimerInterval); // Por si estaba corriendo de antes
+    gameTimerElement.textContent = "⏱️ Tiempo: 0.00 s";
+
+    gameTimerInterval = setInterval(() => {
+        const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
+        gameTimerElement.textContent = `⏱️ Tiempo: ${elapsedSeconds} s`;
+    }, 100);
+
 
     // Limpia la interfaz
     optionsList.innerHTML = "";
@@ -214,7 +224,7 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
 
     // Ocultar pista por defecto
     hintContainer.style.display = 'none';
-    flagHint.innerHTML = '';
+    //flagHint.innerHTML = '';
     showFlagHintButton.style.display = 'inline-block'; // Asegura que vuelva a aparecer el botón
 
 
@@ -223,8 +233,8 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         hintContainer.style.display = 'block';
 
         showFlagHintButton.onclick = () => {
-            flagHint.innerHTML = `<img src="${flag}" alt="Bandera del país" class="flag-question-img">`;
-            showFlagHintButton.style.display = 'none'; // Ocultar botón tras usar pista
+            questionText.innerHTML = `<img src="${flag}" alt="Bandera del país" class="flag-question-img"><br>${question}`;
+            showFlagHintButton.style.display = 'none';
         };
     }
 
@@ -309,8 +319,27 @@ function generateNumericOptions(correctAnswer) {
 
 
 function endGame() {
+    clearInterval(gameTimerInterval); // Detener el cronómetro 
     const totalTime = (Date.now() - startTime) / 1000; // Calcula el tiempo total jugado
-    const avgTimePerQuestion = (totalTime / 5).toFixed(3); // Calcula el tiempo promedio por pregunta
+    const avgTimePerQuestion = (totalTime / 10).toFixed(3); // Calcula el tiempo promedio por pregunta
+
+    // Verificar y actualizar récord
+    const previousHighScore = localStorage.getItem(`highScore_${username}`);
+    const currentScore = score;
+
+
+
+    let recordMessage = "";
+
+    if (previousHighScore !== null && currentScore > Number(previousHighScore)) {
+        localStorage.setItem(`highScore_${username}`, currentScore);
+        recordMessage = `🎉 <strong>¡Nuevo récord, ${username}!</strong> Tu nuevo puntaje es <strong>${currentScore}</strong>.`;
+    } else if (previousHighScore === null) {
+        localStorage.setItem(`highScore_${username}`, currentScore);
+        recordMessage = `🎯 <strong>Primer intento, ${username}!</strong> Este es tu puntaje: <strong>${currentScore}</strong>.`;
+    } else {
+        recordMessage = `✅ Tu puntaje fue <strong>${currentScore}</strong>. Tu récord actual es <strong>${previousHighScore}</strong>.`;
+    }
 
     fetch('/api/submit-score', {
         method: 'POST',

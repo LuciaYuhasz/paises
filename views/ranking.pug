@@ -5,10 +5,14 @@ block content
       h2 🏆 Ranking de los mejores jugadores
       p#loadingMessage Cargando ranking...
       ol#rankingList
-      button#backToGameButton.btn.btn-primary.btn-lg.px-4.py-2.mt-4.shadow
-        i.bi.bi-arrow-counterclockwise.me-2
-        | Volver a jugar
-
+      .d-flex.justify-content-center.gap-3.mt-4
+        button#exitGameButton.btn.btn-danger.btn-lg.px-4.py-2.mt-3.shadow
+          i.bi.bi-door-closed.me-2
+          | Salir del juego
+        button#backToGameButton.btn.btn-primary.btn-lg.px-4.py-2.mt-3.shadow
+          i.bi.bi-arrow-counterclockwise.me-2
+          | Volver a jugar
+       
 
 block scripts 
     script.
@@ -51,4 +55,12 @@ block scripts
       // Botón para volver a jugar
       document.getElementById('backToGameButton').onclick = () => {
         window.location.href = "/";
+      };
+      // Botón para salir del juego
+      document.getElementById('exitGameButton').onclick = () => {
+        document.body.innerHTML = `
+          <div class="exit-message">
+            <h2 class="exit-title"> ¡HASTA PRONTO EXPLORADOR!! ✈️</h2>           
+          </div>
+        `;
       };

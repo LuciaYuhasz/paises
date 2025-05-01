@@ -122,13 +122,20 @@ body {
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     padding: 20px;
+    width: 90%;
     max-width: 600px;
+    margin: 0 auto;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     animation: fadeInGame 1s ease-in-out;
+
+    /*transform: translateY(-30px);*/
+    margin: 80px auto 0 auto;
+
+
 }
 
 @keyframes fadeInGame {
@@ -332,7 +339,7 @@ body {
 }
 
 .flag-question-img {
-    width: 200 px;
+    width: 220px;
     max-width: 90%;
     margin-bottom: 30px;
     border: 2px solid #ccc;
@@ -340,6 +347,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
 }
+
 
 .flag-question-img:hover {
     transform: scale(1.05);
@@ -374,4 +382,70 @@ body {
 #errorContainer {
     font-size: 1.5rem;
     padding: 1.5rem;
+}
+
+.exit-message h2 {
+    font-weight: 600;
+
+
+
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+    text-align: center;
+    font-family: 'Cabin Sketch', cursive;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #105314;
+}
+
+
+.exit-message {
+    margin-top: 100px;
+    padding: 20px;
+    background-color: rgba(249, 249, 249, 0.8);
+    /* Fondo translúcido */
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+#exitGameButton {
+    background: rgba(220, 53, 69, 0.85);
+    /* rojo Bootstrap con opacidad */
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    /* sombra roja */
+    transition: all 0.3s ease-in-out;
+}
+
+#exitGameButton:hover {
+    background: rgba(220, 53, 69, 1);
+    /* más intenso al pasar el mouse */
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.6);
+}
+
+#backToGameButton {
+    background: rgba(40, 167, 69, 0.85);
+    /* verde Bootstrap con opacidad */
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    /* sombra verde */
+    transition: all 0.3s ease-in-out;
+}
+
+#backToGameButton:hover {
+    background: rgba(40, 167, 69, 1);
+    /* verde más fuerte */
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.6);
 }
