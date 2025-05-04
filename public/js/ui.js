@@ -31,3 +31,17 @@ export function setupHintHandler(type, flag, question) {
         };
     }
 }
+
+export function showPointsEarned(addedPoints) {
+    const pointsEarned = document.getElementById('pointsEarned');
+    if (!pointsEarned) return;
+
+    if (addedPoints > 0) {
+        pointsEarned.textContent = `🎯 ¡Sumaste ${addedPoints} puntos!`;
+        pointsEarned.classList.remove('animate');
+        void pointsEarned.offsetWidth; // Forzar reflow
+        pointsEarned.classList.add('animate');
+    } else {
+        pointsEarned.textContent = '';
+    }
+}

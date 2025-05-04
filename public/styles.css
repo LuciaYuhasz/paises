@@ -88,15 +88,16 @@ body {
     background: rgba(255, 255, 255, 0.76);
     border-radius: 20px;
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
-    padding: 30px;
+    padding: 20px;
     text-align: center;
     max-width: 600px;
-    min-height: 600px;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     animation: fadeIn 1s ease-in-out;
+    min-height: auto;
 }
 
 #registerForm>* {
@@ -121,10 +122,9 @@ body {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    padding: 20px;
+    padding: 16px;
     width: 90%;
     max-width: 600px;
-    margin: 0 auto;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -133,7 +133,7 @@ body {
     animation: fadeInGame 1s ease-in-out;
 
     /*transform: translateY(-30px);*/
-    margin: 80px auto 0 auto;
+    margin: 30px auto 0 auto;
 
 
 }
@@ -189,8 +189,8 @@ body {
 
 /* === Lista de opciones === */
 #optionsList .list-group-item {
-    margin: 10px 0;
-    padding: 10px;
+    margin: 8px 0;
+    padding: 9px 12px;
     font-size: 1.1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -448,4 +448,51 @@ body {
     /* verde más fuerte */
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(40, 167, 69, 0.6);
+}
+
+#pointsEarned.animate {
+    animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-height: 750px) {
+
+    #registerForm,
+    #gameArea {
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    .titulo-claro {
+        font-size: 2.2rem;
+    }
+
+    .intro-text {
+        font-size: 1rem;
+    }
+
+    #startGameButton {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+
+    #optionsList .list-group-item {
+        font-size: 0.95rem;
+        padding: 6px 10px;
+    }
 }

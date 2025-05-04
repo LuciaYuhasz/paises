@@ -22,7 +22,8 @@ import {
     questionModal,
     modalMessageQuestion,
     setupHintHandler,
-    initializeProgressBar
+    initializeProgressBar,
+    showPointsEarned
 } from './ui.js';
 
 // VARIABLES DE ESTADO Y JUEGO
@@ -36,6 +37,7 @@ let score = 0; // Puntaje total del juego
 let startTime;
 let username = '';
 let isMusicMuted = false;
+
 
 // EVENTOS DE INTERFAZ
 // sonido al escribir en el campo de nombre de usuario
@@ -178,12 +180,9 @@ function generateQuestion() {
     }
     console.log(`❓ Pregunta #${currentQuestionIndex + 1} | Tipo: ${type} | "${question}" | Opciones: ${options.join(", ")}`);
 
-
-
     // Mostrar la pregunta y opciones en pantalla
     displayQuestion({ question, type, correctAnswer, options, flag: country.flags?.png });
 }
-
 
 // Función para mostrar la pregunta y opciones en pantalla
 function displayQuestion({ question, options, correctAnswer, type, flag }) {
@@ -195,15 +194,10 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         ? `<img src="${flag}" alt="Bandera" class="flag-question-img"><br>${question}`
         : question;
 
-
-    //const hintContainer = document.getElementById('hintContainer');
-    //const showFlagHintButton = document.getElementById('showFlagHintButton');
     const flagHint = document.getElementById('flagHint');
 
 
-    setupHintHandler(type, flag, question); // ✅ Llama a la función importada
-
-
+    setupHintHandler(type, flag, question); // Llama a la función importada
 
     optionsList.innerHTML = ''; // Limpiar lista de opciones
 
@@ -219,12 +213,15 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
             allOptions.forEach(opt => opt.onclick = null); // Deshabilitar clic en opciones
 
             const isCorrect = option.toString().toLowerCase() === correctAnswer.toString().toLowerCase();
-            console.log(`${username} eligió: ${option} | Rta correcta: ${correctAnswer} | Rdo: ${isCorrect ? 'Correcto ✅' : 'Incorrecto ❌'}`);
+            //
+            const addedPoints = isCorrect ? (type === 'flag' ? 5 : 3) : 0;
+            console.log(`${username} eligió: ${option} | Rta correcta: ${correctAnswer} | ${isCorrect ? 'Correcto ✅' : 'Incorrecto ❌'}`);
 
             if (isCorrect) {
                 li.classList.add('correct-answer'); // Estilo para respuesta correcta
                 correctSound.play();
-                score += type === 'flag' ? 5 : 3; // Aumentar puntaje según tipo de pregunta
+                //
+                score += addedPoints; // Sumás los puntos definidos
                 correct++;
                 modalMessageQuestion.textContent = "✅ ¡Correcto!";
             } else {
@@ -234,6 +231,7 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
                 modalMessageQuestion.textContent = `❌ Incorrecto. La respuesta era: ${correctAnswer}`;
             }
 
+            showPointsEarned(addedPoints);
             questionModal.style.display = "flex"; // Mostrar modal de resultado
 
             // Cerrar modal y avanzar a la siguiente pregunta
@@ -281,7 +279,6 @@ function generateNumericOptions(correctAnswer) {
 }
 
 
-
 function endGame() {
     clearInterval(gameTimerInterval); // Detener el cronómetro 
     const totalTime = (Date.now() - startTime) / 1000; // Calcula el tiempo total jugado
@@ -291,9 +288,7 @@ function endGame() {
     const previousHighScore = localStorage.getItem(`highScore_${username}`);
     const currentScore = score;
 
-    console.log(`🏁 Fin del juego para ${username}`);
-    console.log(`⏱️ Tiempo total: ${totalTime.toFixed(3)} s | Tiempo promedio por pregunta: ${avgTimePerQuestion} s`);
-    console.log(`✔️ Correctas: ${correct} | ❌ Incorrectas: ${incorrect} | 🧮 Puntaje final: ${currentScore}`);
+
 
     let recordMessage = "";
 
