@@ -1,18 +1,31 @@
+// IMPORTACION DE MODULOS
+// Sonidos para distintas acciones del juego
+import {
+    keypressSound,
+    buttonClickSound,
+    correctSound,
+    incorrectSound,
+    //backgroundMusic,
+    toggleMusic         // ESTA ES LA FUNCION QUE SUSTITUYE 
+} from './sounds.js';
 
-// Definición de sonidos para efectos de juego
-const keypressSound = new Audio('sounds/tipeo.mp3');
-const buttonClickSound = new Audio('sounds/chalentacept.mp3');
-const correctSound = new Audio('sounds/correcto.mp3');
-const incorrectSound = new Audio('sounds/incorrecto.mp3');
-const backgroundMusic = new Audio('sounds/fondoJuego.mp3'); // Música de fondo 
+// Elementos y funciones de la interfaz de usuario (UI)
+import {
+    questionText,
+    optionsList,
+    registerForm,
+    gameArea,
+    usernameInput,
+    startGameButton,
+    toggleMusicButton,
+    updateProgressBar,
+    questionModal,
+    modalMessageQuestion,
+    setupHintHandler,
+    initializeProgressBar
+} from './ui.js';
 
-backgroundMusic.loop = true; // Reproducir música en bucle
-backgroundMusic.volume = 0.5;
-let isMusicMuted = false; // Estado de silenciamiento de la música
-const toggleMusicButton = document.getElementById('toggleMusicButton');
-const musicControl = document.getElementById('musicControl'); // Contenedor del control de música
-
-// Variables de juego y estado
+// VARIABLES DE ESTADO Y JUEGO
 let gameTimerInterval; // Intervalo del reloj
 let countries = [];
 let usedCountries = [];
@@ -22,40 +35,28 @@ let incorrect = 0; // Contador de respuestas incorrectas
 let score = 0; // Puntaje total del juego
 let startTime;
 let username = '';
+let isMusicMuted = false;
 
-// Elementos del DOM
-const questionText = document.getElementById('questionText');
-const optionsList = document.getElementById('optionsList');
-const registerForm = document.getElementById('registerForm');
-const gameArea = document.getElementById('gameArea');
-const startGameButton = document.getElementById('startGameButton');
-const usernameInput = document.getElementById('username');
-
-// Evento al escribir en el campo de nombre de usuario
+// EVENTOS DE INTERFAZ
+// sonido al escribir en el campo de nombre de usuario
 usernameInput.addEventListener('input', () => {
-    // Reproducir sonido de tipeo
     keypressSound.pause();
     keypressSound.volume = 0.2;
     keypressSound.currentTime = 0;
     keypressSound.play();
 });
 
-//FUNCION DE COMIENZO/REINICIO PARTIDO 
+// Función para iniciar el juego
 function startGame() {
-    console.log("startGame() ejecutado");
-
-    buttonClickSound.pause();
     buttonClickSound.currentTime = 0;
     buttonClickSound.play();
-
     username = usernameInput.value.trim();// trim para eliminar espacios en blanco
     if (!username) return alert('Ingresa tu nombre.');
-
     // Reproduce la música al iniciar el juego, si no está silenciada
-    if (!isMusicMuted) {
-        backgroundMusic.play();
-        musicControl.style.display = 'block';
-    }
+    musicControl.style.display = 'block';
+    toggleMusic(isMusicMuted, toggleMusicButton);
+    console.log(` Inicio del juego con el Usuario: ${username}`);
+
 
     // Reinicia el juego
     currentQuestionIndex = 0;
@@ -78,7 +79,8 @@ function startGame() {
     // Limpia la interfaz
     optionsList.innerHTML = "";
     questionText.textContent = "";
-    document.getElementById("progressBar").style.width = "0%";
+    initializeProgressBar();
+
 
     // Oculta el formulario de registro y el modal final
     registerForm.style.display = 'none';
@@ -86,7 +88,6 @@ function startGame() {
 
     // Verifica si `gameArea` existe antes de cambiar su estilo
     if (gameArea) {
-        console.log("gameArea encontrado, cambiando display a block...");
         gameArea.style.display = "block";
     } else {
         console.error("Error: gameArea no encontrado en el DOM.");
@@ -94,52 +95,39 @@ function startGame() {
 
     // Intenta generar la primera pregunta
     loadCountries().then(() => {
-        console.log("Datos de países cargados, generando primera pregunta...");
         generateQuestion();
     }).catch(err => {
         console.error("Error al cargar países:", err);
     });
 }
 
-
-// Asignacion la función 'startGame' al botón de inicio
+//EVENTO DE BOTONES
+// Asigna la función 'startGame' al botón de inicio
 startGameButton.addEventListener('click', startGame);
 
-// También al botón "Jugar de nuevo"
+// A startGame al botón "Jugar de nuevo"
 document.getElementById('closeResultModalButton').addEventListener('click', startGame);
-
-
 
 // Evento para silenciar o reanudar la música de fondo
 toggleMusicButton.addEventListener('click', () => {
     isMusicMuted = !isMusicMuted;
-    if (isMusicMuted) {
-        backgroundMusic.pause();
-        toggleMusicButton.innerHTML = '<i class="bi bi-volume-mute"></i> Reanudar Música';
-        toggleMusicButton.classList.add('muted'); // Cambia el estilo
-
-        toggleMusicButton.style.backgroundColor = "#f44336";
-    } else {
-        backgroundMusic.play();
-        toggleMusicButton.innerHTML = '<i class="bi bi-volume-up"></i> Silenciar Música';
-        toggleMusicButton.classList.remove('muted'); // Vuelve al estilo original
-
-        toggleMusicButton.style.backgroundColor = "#4CAF50";
-        console.log("Clase muted eliminada:", toggleMusicButton.classList.contains('muted'))
-    }
-    localStorage.setItem('isMusicMuted', isMusicMuted);
+    console.log(`[🔊] Música ${isMusicMuted ? 'silenciada' : 'activada'}`);
+    toggleMusic(isMusicMuted, toggleMusicButton);  // Ahora usa la función toggleMusic
 });
 
-// FUNCION ASINCRONA PARA CARGAR PAISES EN LA API 
+// // Función asincrónica: carga países desde la API 
 async function loadCountries() {
     const errorContainer = document.getElementById('errorContainer');
     errorContainer.style.display = 'none'; // Oculta errores anteriores
     errorContainer.textContent = '';
+    console.log("[🌐] Cargando países desde la API...");
     try {
         const response = await fetch('https://restcountries.com/v3.1/all');
+
+
         // Validar estado de respuesta HTTP
         if (!response.ok) {
-            throw new Error(`Error al obtener países: ${response.status} ${response.statusText}`);
+            throw new Error(`No se pudo cargar la API de países ⚠️: ${response.status} ${response.statusText}`);
         }
         countries = await response.json();
     } catch (error) {
@@ -149,14 +137,6 @@ async function loadCountries() {
         errorContainer.style.display = 'block'; // Muestra el error en pantalla
     }
 }
-
-// Función para actualizar la barra de progreso del juego
-function updateProgressBar() {
-    const progress = (currentQuestionIndex / 10) * 100;
-    document.getElementById("progressBar").style.width = `${progress}%`;// se  ajusta el ancho segun el valor de progrees, que representa el porsentaje 
-}
-
-
 // Función para generar y mostrar una pregunta aleatoria
 function generateQuestion() {
     if (currentQuestionIndex >= 10) {
@@ -167,17 +147,13 @@ function generateQuestion() {
     do {
         country = countries[Math.floor(Math.random() * countries.length)];
     } while (usedCountries.includes(country.name.common));
-
     usedCountries.push(country.name.common); // Agregar país usado al array
-
-    // Definir tipos de preguntas disponibles
+    // Tipos de preguntas posibles
     const types = ['capital', 'flag', 'borders'];
-    const type = types[Math.floor(Math.random() * types.length)]; // Seleccionar tipo de pregunta aleatoriamente
-
+    const type = types[Math.floor(Math.random() * types.length)];
     let question = '';
     let correctAnswer = '';
     let options = [];
-
     switch (type) {
         case 'capital':
             if (!country.capital) return generateQuestion(); // Evitar preguntas sin capital definida
@@ -192,8 +168,6 @@ function generateQuestion() {
             question = `¿Qué país está representado por esta bandera?`;
             //correctAnswer = country.name.common;
             correctAnswer = country.translations?.spa?.common || country.name.common;
-
-
             options = generateOptions(correctAnswer); // Generar opciones de respuesta
             break;
         case 'borders':
@@ -202,6 +176,10 @@ function generateQuestion() {
             options = generateNumericOptions(correctAnswer); // Generar opciones numéricas de respuesta
             break;
     }
+    console.log(`❓ Pregunta #${currentQuestionIndex + 1} | Tipo: ${type} | "${question}" | Opciones: ${options.join(", ")}`);
+
+
+
     // Mostrar la pregunta y opciones en pantalla
     displayQuestion({ question, type, correctAnswer, options, flag: country.flags?.png });
 }
@@ -218,29 +196,18 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         : question;
 
 
-    const hintContainer = document.getElementById('hintContainer');
-    const showFlagHintButton = document.getElementById('showFlagHintButton');
+    //const hintContainer = document.getElementById('hintContainer');
+    //const showFlagHintButton = document.getElementById('showFlagHintButton');
     const flagHint = document.getElementById('flagHint');
 
-    // Ocultar pista por defecto
-    hintContainer.style.display = 'none';
-    //flagHint.innerHTML = '';
-    showFlagHintButton.style.display = 'inline-block'; // Asegura que vuelva a aparecer el botón
+
+    setupHintHandler(type, flag, question); // ✅ Llama a la función importada
 
 
-    // Mostrar botón de pista si no es pregunta de bandera
-    if (type !== 'flag' && flag) {
-        hintContainer.style.display = 'block';
-
-        showFlagHintButton.onclick = () => {
-            questionText.innerHTML = `<img src="${flag}" alt="Bandera del país" class="flag-question-img"><br>${question}`;
-            showFlagHintButton.style.display = 'none';
-        };
-    }
 
     optionsList.innerHTML = ''; // Limpiar lista de opciones
 
-    // Mostrar cada opción como elemento de lista
+    //  // Crear botón para cada opción opción como elemento de lista
     options.forEach((option, index) => {
         const li = document.createElement('li');
         li.textContent = option;
@@ -252,20 +219,17 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
             allOptions.forEach(opt => opt.onclick = null); // Deshabilitar clic en opciones
 
             const isCorrect = option.toString().toLowerCase() === correctAnswer.toString().toLowerCase();
+            console.log(`${username} eligió: ${option} | Rta correcta: ${correctAnswer} | Rdo: ${isCorrect ? 'Correcto ✅' : 'Incorrecto ❌'}`);
 
             if (isCorrect) {
                 li.classList.add('correct-answer'); // Estilo para respuesta correcta
-                correctSound.pause();
-                correctSound.currentTime = 0;
-                correctSound.play(); // Reproducir sonido de respuesta correcta
+                correctSound.play();
                 score += type === 'flag' ? 5 : 3; // Aumentar puntaje según tipo de pregunta
                 correct++;
                 modalMessageQuestion.textContent = "✅ ¡Correcto!";
             } else {
                 li.classList.add('incorrect-answer'); // Estilo para respuesta incorrecta
-                incorrectSound.pause();
-                incorrectSound.currentTime = 0;
-                incorrectSound.play(); // Reproducir sonido de respuesta incorrecta
+                incorrectSound.play();
                 incorrect++;
                 modalMessageQuestion.textContent = `❌ Incorrecto. La respuesta era: ${correctAnswer}`;
             }
@@ -276,11 +240,11 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
             document.getElementById('closeQuestionModalButton').onclick = () => {
                 questionModal.style.display = "none";
                 currentQuestionIndex++;
-                updateProgressBar();
+                updateProgressBar(currentQuestionIndex);
                 generateQuestion();
             };
         };
-
+        // Animación de aparición
         setTimeout(() => {
             li.style.opacity = 1; // Hacer visible la opción con animación
             li.style.transform = 'translateY(0)'; // Posición final
@@ -304,7 +268,7 @@ function generateOptions(correctAnswer) {
 
     return Array.from(options).sort(() => Math.random() - 0.5);
 }
-
+// Opciones numéricas (cantidad de bordes)
 function generateNumericOptions(correctAnswer) {
     const options = new Set();
     options.add(correctAnswer);
@@ -327,7 +291,9 @@ function endGame() {
     const previousHighScore = localStorage.getItem(`highScore_${username}`);
     const currentScore = score;
 
-
+    console.log(`🏁 Fin del juego para ${username}`);
+    console.log(`⏱️ Tiempo total: ${totalTime.toFixed(3)} s | Tiempo promedio por pregunta: ${avgTimePerQuestion} s`);
+    console.log(`✔️ Correctas: ${correct} | ❌ Incorrectas: ${incorrect} | 🧮 Puntaje final: ${currentScore}`);
 
     let recordMessage = "";
 

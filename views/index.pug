@@ -1,6 +1,7 @@
 extends layout
 block head
-  script(src="/game.js" defer)
+  //script(src="/game.js" defer)
+  script(type="module" src="/js/game.js")
 block content
     .text-center.mt-3#musicControl(style="display: none;")
       button#toggleMusicButton.btn.btn-secondary
