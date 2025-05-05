@@ -4,7 +4,16 @@ block content
      #rankingContainer
       h2 🏆 Ranking de los mejores jugadores
       p#loadingMessage Cargando ranking...
-      ol#rankingList
+      //ol#rankingList
+      table.table.table-striped
+       thead
+        tr
+         th #
+         th Jugador
+         th Puntaje
+         th ✔️ Correctas
+         th ❌ Incorrectas
+       tbody#rankingList
       .d-flex.justify-content-center.gap-3.mt-4
         button#exitGameButton.btn.btn-danger.btn-lg.px-4.py-2.mt-3.shadow
           i.bi.bi-door-closed.me-2
@@ -40,8 +49,16 @@ block scripts
           // Actualizar lista en el DOM
           const rankingList = document.getElementById('rankingList');
           rankingList.innerHTML = rankingData.map((player, index) => {
-            let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
-            return `<li><strong>${index + 1}.</strong> ${medal} ${player.player} - ${player.score} pts</li>`;
+            const  medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "";
+            return `
+              <tr>
+                <td>${index + 1} ${medal}</td>
+                <td>${player.player}</td>
+                <td>${player.score}</td>
+                <td>${player.correct}</td>
+                <td>${player.incorrect}</td>
+              </tr>
+             `;
           }).join('');
 
         } catch (error) {

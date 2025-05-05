@@ -55,6 +55,8 @@ function startGame() {
     buttonClickSound.play();
     // Obtener y validar nombre
     username = usernameInput.value.trim();
+    localStorage.setItem("nombre", username);
+
     if (!username) return alert('Ingresa tu nombre.');
     // Control de musica de fondo
     musicControl.style.display = 'block';
@@ -288,19 +290,21 @@ function endGame() {
     const totalTime = (Date.now() - startTime) / 1000; // tiempo total jugado
     const avgTimePerQuestion = (totalTime / 10).toFixed(3); // tiempo promedio por pregunta
 
+    const username = localStorage.getItem("nombre"); // 👈 Recuperás el nombre desde el localStorage
     // Verificar y actualizar récord perdonal 
     const previousHighScore = localStorage.getItem(`highScore_${username}`);
+
     const currentScore = score;
     let recordMessage = "";
 
     if (previousHighScore !== null && currentScore > Number(previousHighScore)) {
         localStorage.setItem(`highScore_${username}`, currentScore);
-        recordMessage = `🎉 <strong>¡Nuevo récord, ${username}!</strong> Tu nuevo puntaje es <strong>${currentScore}</strong>.`;
+        recordMessage = `🎉 <strong>¡Superaste tu récord ${username}!</strong> Tu nuevo puntaje es <strong>${currentScore}</strong>.`;
     } else if (previousHighScore === null) {
         localStorage.setItem(`highScore_${username}`, currentScore);
         recordMessage = `🎯 <strong>Primer intento, ${username}!</strong> Este es tu puntaje: <strong>${currentScore}</strong>.`;
     } else {
-        recordMessage = `✅ Tu puntaje fue <strong>${currentScore}</strong>. Tu récord actual es <strong>${previousHighScore}</strong>.`;
+        recordMessage = `✅ Tu puntaje fue <strong>${currentScore}</strong>. Tu récord historico es <strong>${previousHighScore}</strong>.`;
     }
 
     // Enviar resultados al backend
@@ -325,12 +329,13 @@ function endGame() {
                 <p>Correctas: <strong>${correct}</strong></p>
                 <p>Incorrectas: <strong>${incorrect}</strong></p>
                 <p>Tiempo total: <strong>${totalTime.toFixed(3)} segundos</strong></p>
-                <p>Tiempo promedio por pregunta: <strong>${avgTimePerQuestion} segundos</strong></p>               
+                <p>Tiempo promedio por pregunta: <strong>${avgTimePerQuestion} segundos</strong></p>  
+                <p>${recordMessage}</p>              
             `;
 
             // Mostrar ranking si está disponible
             if (data.position !== null) {
-                modalRanking.textContent = `🔥🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥🔥`;
+                modalRanking.textContent = `🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥`;
             } else {
                 modalRanking.textContent = ` Todavía no estás en la cima, pero cada intento te acerca más 🔝`;
             }
