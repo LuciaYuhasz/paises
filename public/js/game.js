@@ -5,7 +5,6 @@ import {
     buttonClickSound,
     correctSound,
     incorrectSound,
-    //backgroundMusic,
     toggleMusic         // ESTA ES LA FUNCION QUE SUSTITUYE 
 } from './sounds.js';
 
@@ -19,15 +18,17 @@ import {
     startGameButton,
     toggleMusicButton,
     updateProgressBar,
-    questionModal,
-    modalMessageQuestion,
+    //questionModal,
+    //modalMessageQuestion,
     setupHintHandler,
     initializeProgressBar,
-    showPointsEarned
+    showPointsEarned,
+    startGameTimer,
+    stopGameTimer,
 } from './ui.js';
 
 // VARIABLES DE ESTADO Y JUEGO
-let gameTimerInterval; // Intervalo del reloj
+
 let countries = [];
 let usedCountries = [];
 let currentQuestionIndex = 0; // Índice de la pregunta actual
@@ -37,7 +38,6 @@ let score = 0; // Puntaje total del juego
 let startTime;
 let username = '';
 let isMusicMuted = false;
-
 
 // EVENTOS DE INTERFAZ
 // sonido al escribir en el campo de nombre de usuario
@@ -50,41 +50,33 @@ usernameInput.addEventListener('input', () => {
 
 // Función para iniciar el juego
 function startGame() {
+    // Sonido del botón
     buttonClickSound.currentTime = 0;
     buttonClickSound.play();
-    username = usernameInput.value.trim();// trim para eliminar espacios en blanco
+    // Obtener y validar nombre
+    username = usernameInput.value.trim();
     if (!username) return alert('Ingresa tu nombre.');
-    // Reproduce la música al iniciar el juego, si no está silenciada
+    // Control de musica de fondo
     musicControl.style.display = 'block';
+    //Activa musica si no esta silenciada
     toggleMusic(isMusicMuted, toggleMusicButton);
     console.log(` Inicio del juego con el Usuario: ${username}`);
 
-
-    // Reinicia el juego
+    // Reinicia el estado de juego
     currentQuestionIndex = 0;
     correct = 0;
     incorrect = 0;
     score = 0;
     usedCountries = [];
     startTime = Date.now();
+    startGameTimer(startTime); // comienza el reloj visible
 
-    const gameTimerElement = document.getElementById('gameTimer');
-    clearInterval(gameTimerInterval); // Por si estaba corriendo de antes
-    gameTimerElement.textContent = "⏱️ Tiempo: 0.00 s";
-
-    gameTimerInterval = setInterval(() => {
-        const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(2);
-        gameTimerElement.textContent = `⏱️ Tiempo: ${elapsedSeconds} s`;
-    }, 100);
-
-
-    // Limpia la interfaz
+    // Limpieza de interfaz
     optionsList.innerHTML = "";
     questionText.textContent = "";
     initializeProgressBar();
 
-
-    // Oculta el formulario de registro y el modal final
+    // Ocultar formulario de registro y el modal final
     registerForm.style.display = 'none';
     document.getElementById('gameResultModal').style.display = "none";
 
@@ -94,51 +86,52 @@ function startGame() {
     } else {
         console.error("Error: gameArea no encontrado en el DOM.");
     }
-
-    // Intenta generar la primera pregunta
+    // Cargar países y generar la primera pregunta
     loadCountries().then(() => {
         generateQuestion();
     }).catch(err => {
         console.error("Error al cargar países:", err);
     });
 }
-
-//EVENTO DE BOTONES
-// Asigna la función 'startGame' al botón de inicio
+// Iniciar juego con el botón principal
 startGameButton.addEventListener('click', startGame);
 
-// A startGame al botón "Jugar de nuevo"
+// Iniciar juego con el botón "Jugar de nuevo"
 document.getElementById('closeResultModalButton').addEventListener('click', startGame);
 
 // Evento para silenciar o reanudar la música de fondo
 toggleMusicButton.addEventListener('click', () => {
     isMusicMuted = !isMusicMuted;
     console.log(`[🔊] Música ${isMusicMuted ? 'silenciada' : 'activada'}`);
-    toggleMusic(isMusicMuted, toggleMusicButton);  // Ahora usa la función toggleMusic
+    toggleMusic(isMusicMuted, toggleMusicButton);
 });
 
-// // Función asincrónica: carga países desde la API 
+// Función asincrónica: carga países desde la API 
 async function loadCountries() {
     const errorContainer = document.getElementById('errorContainer');
-    errorContainer.style.display = 'none'; // Oculta errores anteriores
+    // Ocultar errores previos y limpiar el mensaje
+    errorContainer.style.display = 'none';
     errorContainer.textContent = '';
+
     console.log("[🌐] Cargando países desde la API...");
+
     try {
+        // Fetch de la API de países
         const response = await fetch('https://restcountries.com/v3.1/all');
-
-
         // Validar estado de respuesta HTTP
         if (!response.ok) {
             throw new Error(`No se pudo cargar la API de países ⚠️: ${response.status} ${response.statusText}`);
         }
+        // Convertir la respuesta en JSON
         countries = await response.json();
     } catch (error) {
-
+        // Manejo de  errores de carga
         console.error(error);
         errorContainer.textContent = `⚠️ ${error.message}`;
         errorContainer.style.display = 'block'; // Muestra el error en pantalla
     }
 }
+
 // Función para generar y mostrar una pregunta aleatoria
 function generateQuestion() {
     if (currentQuestionIndex >= 10) {
@@ -146,38 +139,47 @@ function generateQuestion() {
     }
 
     let country;
+    // Elegir un país aleatorio que no haya sido usado aún
     do {
         country = countries[Math.floor(Math.random() * countries.length)];
     } while (usedCountries.includes(country.name.common));
-    usedCountries.push(country.name.common); // Agregar país usado al array
-    // Tipos de preguntas posibles
+    // Registrar el país como utilizado en el array
+    usedCountries.push(country.name.common);
+    // Tipos de preguntas posibles // capital, bandera, fronteras.
     const types = ['capital', 'flag', 'borders'];
     const type = types[Math.floor(Math.random() * types.length)];
+
     let question = '';
     let correctAnswer = '';
     let options = [];
+
     switch (type) {
         case 'capital':
-            if (!country.capital) return generateQuestion(); // Evitar preguntas sin capital definida
-            question = `¿${country.capital[0]} , es la capital de qué país?`;
-            //correctAnswer = country.name.common;
-            correctAnswer = country.translations?.spa?.common || country.name.common;
+            // Verificar si el país tiene capital
+            if (!country.capital) return generateQuestion();
 
+            question = `¿${country.capital[0]} , es la capital de qué país?`;
+            correctAnswer = country.translations?.spa?.common || country.name.common;
             options = generateOptions(correctAnswer); // Generar opciones de respuesta
             break;
+
         case 'flag':
+            // Verificar si el país tiene bandera
             if (!country.flags || !country.flags.png) return generateQuestion(); // Evitar países sin bandera
+
             question = `¿Qué país está representado por esta bandera?`;
             //correctAnswer = country.name.common;
             correctAnswer = country.translations?.spa?.common || country.name.common;
             options = generateOptions(correctAnswer); // Generar opciones de respuesta
             break;
+
         case 'borders':
             question = `¿Cuántos países limítrofes tiene ${country.name.common}?`;
             correctAnswer = country.borders ? country.borders.length : 0; // Obtener número de países limítrofes
             options = generateNumericOptions(correctAnswer); // Generar opciones numéricas de respuesta
             break;
     }
+
     console.log(`❓ Pregunta #${currentQuestionIndex + 1} | Tipo: ${type} | "${question}" | Opciones: ${options.join(", ")}`);
 
     // Mostrar la pregunta y opciones en pantalla
@@ -194,27 +196,29 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         ? `<img src="${flag}" alt="Bandera" class="flag-question-img"><br>${question}`
         : question;
 
-    const flagHint = document.getElementById('flagHint');
+    //const flagHint = document.getElementById('flagHint');
 
+    // Ocultar/mostrar la pista según el tipo. Llama a funcion importada 
+    setupHintHandler(type, flag, question);
 
-    setupHintHandler(type, flag, question); // Llama a la función importada
+    // Limpiar lista de opciones
+    optionsList.innerHTML = '';
 
-    optionsList.innerHTML = ''; // Limpiar lista de opciones
-
-    //  // Crear botón para cada opción opción como elemento de lista
+    //Crear botón para cada opción opción como elemento de lista
     options.forEach((option, index) => {
         const li = document.createElement('li');
         li.textContent = option;
-        li.classList.add('list-group-item'); // Estilo básico con animaciones
-        li.style.animationDelay = `${index * 0.2}s`; // Retraso dinámico para cada opción
+        li.classList.add('list-group-item'); // Estilo
+        li.style.animationDelay = `${index * 0.1}s`; // Retraso dinámico para cada opción
 
+        // Lógica al hacer clic en una opción
         li.onclick = () => {
             const allOptions = document.querySelectorAll('#optionsList li');
-            allOptions.forEach(opt => opt.onclick = null); // Deshabilitar clic en opciones
+            allOptions.forEach(opt => opt.onclick = null); // Deshabilitar todas las opciones luego del click
 
             const isCorrect = option.toString().toLowerCase() === correctAnswer.toString().toLowerCase();
-            //
             const addedPoints = isCorrect ? (type === 'flag' ? 5 : 3) : 0;
+
             console.log(`${username} eligió: ${option} | Rta correcta: ${correctAnswer} | ${isCorrect ? 'Correcto ✅' : 'Incorrecto ❌'}`);
 
             if (isCorrect) {
@@ -234,7 +238,7 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
             showPointsEarned(addedPoints);
             questionModal.style.display = "flex"; // Mostrar modal de resultado
 
-            // Cerrar modal y avanzar a la siguiente pregunta
+            // Continuar al cerrar el modal
             document.getElementById('closeQuestionModalButton').onclick = () => {
                 questionModal.style.display = "none";
                 currentQuestionIndex++;
@@ -252,44 +256,41 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
     });
 }
 
-// Función para generar opciones de respuesta
+// Función para generar opciones de respuesta (tipo texto), incluyendo la correcta
 function generateOptions(correctAnswer) {
     const options = new Set();
-    options.add(correctAnswer);
+    options.add(correctAnswer);// Asegura que la opción correcta esté presente
 
     while (options.size < 4) {
         const random = countries[Math.floor(Math.random() * countries.length)];
-        //options.add(random.name.common);
         const nameInSpanish = random.translations?.spa?.common || random.name.common;
-        options.add(nameInSpanish);
+        options.add(nameInSpanish);// Agrega nombres únicos en español
     }
-
+    // Devuelve las opciones en orden aleatorio
     return Array.from(options).sort(() => Math.random() - 0.5);
 }
-// Opciones numéricas (cantidad de bordes)
+// gerera un conjunto de  4 opciones numéricas usada para la pregunta de cantidad de fronteras.
 function generateNumericOptions(correctAnswer) {
     const options = new Set();
     options.add(correctAnswer);
 
     while (options.size < 4) {
-        options.add(Math.floor(Math.random() * 10));
+        options.add(Math.floor(Math.random() * 10));// Números entre 0 y 9
     }
-
+    // Devuelve las opciones ordenadas de menor a mayor
     return Array.from(options).sort((a, b) => a - b);
 }
 
-
+// Función que se ejecuta al finalizar el juego
 function endGame() {
-    clearInterval(gameTimerInterval); // Detener el cronómetro 
-    const totalTime = (Date.now() - startTime) / 1000; // Calcula el tiempo total jugado
-    const avgTimePerQuestion = (totalTime / 10).toFixed(3); // Calcula el tiempo promedio por pregunta
+    stopGameTimer();// Detener el cronómetro 
+    // Calcular estadísticas de tiempo
+    const totalTime = (Date.now() - startTime) / 1000; // tiempo total jugado
+    const avgTimePerQuestion = (totalTime / 10).toFixed(3); // tiempo promedio por pregunta
 
-    // Verificar y actualizar récord
+    // Verificar y actualizar récord perdonal 
     const previousHighScore = localStorage.getItem(`highScore_${username}`);
     const currentScore = score;
-
-
-
     let recordMessage = "";
 
     if (previousHighScore !== null && currentScore > Number(previousHighScore)) {
@@ -302,6 +303,7 @@ function endGame() {
         recordMessage = `✅ Tu puntaje fue <strong>${currentScore}</strong>. Tu récord actual es <strong>${previousHighScore}</strong>.`;
     }
 
+    // Enviar resultados al backend
     fetch('/api/submit-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -323,20 +325,18 @@ function endGame() {
                 <p>Correctas: <strong>${correct}</strong></p>
                 <p>Incorrectas: <strong>${incorrect}</strong></p>
                 <p>Tiempo total: <strong>${totalTime.toFixed(3)} segundos</strong></p>
-                <p>Tiempo promedio por pregunta: <strong>${avgTimePerQuestion} segundos</strong></p>
-                
+                <p>Tiempo promedio por pregunta: <strong>${avgTimePerQuestion} segundos</strong></p>               
             `;
-            // Mensaje de ranking 
+
+            // Mostrar ranking si está disponible
             if (data.position !== null) {
                 modalRanking.textContent = `🔥🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥🔥`;
             } else {
                 modalRanking.textContent = ` Todavía no estás en la cima, pero cada intento te acerca más 🔝`;
             }
 
-            // Mostrar el modal
+            // Mostrar el modal  y permitir reinicio
             gameModal.style.display = "flex";
-
-            // Asignar evento al botón "Jugar de nuevo"
             document.getElementById('closeResultModalButton').onclick = startGame;
         })
         .catch(err => {
@@ -344,7 +344,7 @@ function endGame() {
             alert("Ocurrió un error al guardar el puntaje.");
         });
 }
-
+// Botones para ver el ranking 
 document.getElementById('viewRankingButton').onclick = () => {
     window.location.href = "/ranking"; // Redirige a la nueva página de ranking
 };
