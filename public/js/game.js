@@ -331,7 +331,7 @@ function endGame() {
 
             // Mostrar ranking si está disponible
             if (data.position !== null) {
-                modalRanking.textContent = `🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥`;
+                modalRanking.textContent = `🔥¡tu mejor posicion en el ranking:  ${data.position}, FELICITACIONES!!🔥`;
             } else {
                 modalRanking.textContent = ` Todavía no estás en el top 20, pero cada intento te acerca más 🔝`;
             }
