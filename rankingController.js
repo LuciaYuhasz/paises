@@ -17,7 +17,7 @@ const saveScore = async (username, score, correct, incorrect, totalTime, avgTime
     try {
         //  Agregar nuevo puntaje
         rankings.push({ player: username, score, correct, incorrect, totalTime, avgTimePerQuestion });
-        console.log(`📥 Recibido: ${username} con puntaje ${score}`);
+        console.log(`Recibido: ${username} con puntaje ${score}`);
 
         // Ordenar el ranking por puntaje y luego por tiempo total 
         rankings.sort((a, b) => {
@@ -77,7 +77,7 @@ const getRanking = async (req, res) => {
         const rankings = await readRankingData();
 
         if (!rankings || rankings.length === 0) {
-            return res.status(404).json({ message: "⚠️ No hay datos de ranking disponibles." });
+            return res.status(404).json({ message: "No hay datos de ranking disponibles." });
         }
         console.log("Enviando ranking con", rankings.length, "jugadores.");
         res.json(rankings);

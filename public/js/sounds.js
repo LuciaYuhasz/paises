@@ -6,7 +6,7 @@ export const correctSound = new Audio('sounds/correcto.mp3');
 export const incorrectSound = new Audio('sounds/incorrecto.mp3');
 export const backgroundMusic = new Audio('sounds/fondoJuego.mp3');
 backgroundMusic.loop = true;
-backgroundMusic.volume = 0.5;
+backgroundMusic.volume = 0.3;
 
 export function toggleMusic(isMuted, button) {
     // Controla la música

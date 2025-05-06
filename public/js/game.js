@@ -5,7 +5,7 @@ import {
     buttonClickSound,
     correctSound,
     incorrectSound,
-    toggleMusic         // ESTA ES LA FUNCION QUE SUSTITUYE 
+    toggleMusic
 } from './sounds.js';
 
 // Elementos y funciones de la interfaz de usuario (UI)
@@ -18,8 +18,6 @@ import {
     startGameButton,
     toggleMusicButton,
     updateProgressBar,
-    //questionModal,
-    //modalMessageQuestion,
     setupHintHandler,
     initializeProgressBar,
     showPointsEarned,
@@ -198,8 +196,6 @@ function displayQuestion({ question, options, correctAnswer, type, flag }) {
         ? `<img src="${flag}" alt="Bandera" class="flag-question-img"><br>${question}`
         : question;
 
-    //const flagHint = document.getElementById('flagHint');
-
     // Ocultar/mostrar la pista según el tipo. Llama a funcion importada 
     setupHintHandler(type, flag, question);
 
@@ -337,7 +333,7 @@ function endGame() {
             if (data.position !== null) {
                 modalRanking.textContent = `🔥¡LLEGASTE AL PUESTO ${data.position}, FELICITACIONES!!🔥`;
             } else {
-                modalRanking.textContent = ` Todavía no estás en la cima, pero cada intento te acerca más 🔝`;
+                modalRanking.textContent = ` Todavía no estás en el top 20, pero cada intento te acerca más 🔝`;
             }
 
             // Mostrar el modal  y permitir reinicio
@@ -357,3 +353,4 @@ document.getElementById('viewRankingButton').onclick = () => {
 document.getElementById('viewRankingButtonFinal').onclick = () => {
     window.location.href = "/ranking";
 };
+
