@@ -1,10 +1,18 @@
 [
   {
-    "player": "aaaa",
-    "score": 11,
-    "correct": 3,
-    "incorrect": 7,
-    "totalTime": 16.127,
-    "avgTimePerQuestion": "1.613"
+    "player": "Pedro",
+    "score": 24,
+    "correct": 6,
+    "incorrect": 4,
+    "totalTime": 38.303,
+    "avgTimePerQuestion": "3.830"
+  },
+  {
+    "player": "Camila",
+    "score": 16,
+    "correct": 4,
+    "incorrect": 6,
+    "totalTime": 39.933,
+    "avgTimePerQuestion": "3.993"
   }
 ]
