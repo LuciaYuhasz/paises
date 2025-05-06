@@ -3,7 +3,7 @@ const { saveScore, getRanking } = require('./rankingController');
 
 const router = express.Router();
 
-// Ruta para enviar puntaje al ranking
+// // POST /api/submit-score. Guarda un nuevo puntaje
 router.post('/submit-score', async (req, res) => {
     console.log("Datos recibidos:", req.body);
     const { username, score, correct, incorrect, totalTime, avgTimePerQuestion } = req.body;
@@ -16,10 +16,12 @@ router.post('/submit-score', async (req, res) => {
         const result = await saveScore(username, score, correct, incorrect, totalTime, avgTimePerQuestion);
         res.json(result);
     } catch (error) {
+        console.error("Error al guardar el ranking (POST /submit-score):", error.message);
         res.status(500).json({ message: "Error al guardar el ranking." });
     }
 });
 
+// GET /api/ranking . Devuelve el top de jugadores
 router.get('/ranking', getRanking);
 
 module.exports = router;

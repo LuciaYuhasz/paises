@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const MAX_RANKING_SIZE = 20;
 const rankingFilePath = path.join(__dirname, 'data', 'ranking.json');
+
 // ranking una sola vez en memoria
 let rankings = [];
 try {
@@ -10,39 +12,46 @@ try {
     console.error("Error leyendo el ranking al iniciar:", error.message);
 }
 
-
 // Guardar un nuevo puntaje en el ranking
 const saveScore = async (username, score, correct, incorrect, totalTime, avgTimePerQuestion) => {
     try {
-
+        //  Agregar nuevo puntaje
         rankings.push({ player: username, score, correct, incorrect, totalTime, avgTimePerQuestion });
+        console.log(`📥 Recibido: ${username} con puntaje ${score}`);
 
-        // Ordenar el ranking por puntaje y luego por tiempo total (menor tiempo mejor)
+        // Ordenar el ranking por puntaje y luego por tiempo total 
         rankings.sort((a, b) => {
-            if (b.score !== a.score) {
-                return b.score - a.score; // Primero se ordena por puntaje
-            }
+            if (b.score !== a.score) return b.score - a.score; // Primero se ordena por puntaje
             return a.totalTime - b.totalTime; // Si hay empate, el que jugó en menos tiempo tiene mejor posición
         });
 
-        // Mantener solo los mejores 20 jugadores
-        rankings = rankings.slice(0, 20);
+        // 3. Guardar posición antes de recortar
+        const indexBeforeCut = rankings.findIndex(entry => entry.player === username);
+        const positionBeforeCut = indexBeforeCut !== -1 ? indexBeforeCut + 1 : null;
+
+        // Mantener solo los mejores 20 jugadores, 
+        rankings = rankings.slice(0, MAX_RANKING_SIZE);
         console.log("Rankings antes de guardar:", rankings);
 
+        // Verificar si quedó dentro del top 20
+        const indexFinal = rankings.findIndex(entry => entry.player === username);
+        const positionFinal = indexFinal !== -1 ? indexFinal + 1 : null;
+
+        if (positionFinal !== null) {
+            console.log(`${username} guardado en el TOP 20 con puntaje ${score}. Posición final: ${positionFinal}`);
+        } else {
+            console.log(`${username} NO quedó en el top 20. Posición previa al recorte: ${positionBeforeCut}`);
+        }
+
+        //  Guardar en archivo
         await fs.promises.writeFile(rankingFilePath, JSON.stringify(rankings, null, 2), 'utf8');
         console.log("Guardado exitosamente!");
 
-        //const position = rankings.findIndex(entry => entry.player === username) + 1;
-
-        const index = rankings.findIndex(entry => entry.player === username);
-        const position = index !== -1 ? index + 1 : null;
         return {
             message: "Puntaje guardado correctamente",
-            position: position, // puede ser null
-            included: position !== null
+            position: positionFinal,
+            included: positionFinal !== null
         };
-
-
 
     } catch (error) {
         console.error("Error guardando el ranking:", error.message);
@@ -70,7 +79,7 @@ const getRanking = async (req, res) => {
         if (!rankings || rankings.length === 0) {
             return res.status(404).json({ message: "⚠️ No hay datos de ranking disponibles." });
         }
-
+        console.log("Enviando ranking con", rankings.length, "jugadores.");
         res.json(rankings);
     } catch (error) {
         console.error("Error al leer el ranking:", error.message);
